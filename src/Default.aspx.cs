@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.ServiceModel.Syndication;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Hosting;
 using System.Web.UI;
@@ -35,7 +37,11 @@ public partial class _Default : Page
         {
             SyndicationFeed feed = await DownloadFeed(config.AppSettings[key]);
     
-            rss.Items = feed.Items.GroupBy(i => i.Title.Text).Select(i => i.First()).OrderByDescending(i => i.PublishDate.Date);
+            foreach(var item in feed.Items)
+            {
+                item.Authors.Add(new SyndicationPerson(key.Substring(5)));
+            }
+            rss.Items = rss.Items.Union(feed.Items).GroupBy(i => i.Title.Text).Select(i => i.First()).OrderByDescending(i => i.PublishDate.Date);
         }
 
         using (XmlWriter writer = XmlWriter.Create(_masterFile))
@@ -64,4 +70,22 @@ public partial class _Default : Page
             return new SyndicationFeed();
         }
     }
+
+    public IEnumerable<SyndicationItem> GetData()
+    {
+        using (XmlReader reader = XmlReader.Create(_masterFile))
+        {
+            var count = int.Parse(config.AppSettings["postsPerPage"]);
+            var items = SyndicationFeed.Load(reader).Items.Skip((_page - 1) * count).Take(count);
+            return items.Select(item => { CleanItem(item); return item; });
+        }
+    }
+
+    private static void CleanItem(SyndicationItem item)
+    {
+        string summary = item.Summary != null ? item.Summary.Text : ((TextSyndicationContent)item.Content).Text;
+        summary = Regex.Replace(summary, "<[^>]*>", ""); // Strips out HTML
+        item.Summary = new TextSyndicationContent(string.Join("", summary.Take(300)) + "...");
+    }
+
 }
