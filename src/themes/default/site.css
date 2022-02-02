@@ -25,7 +25,7 @@ header {
     text-align: left;
     height: 60px;
     line-height: 60px;
-    background: #68217a;    
+    background: #016ABF;    
 }
 
 header h1{
@@ -86,7 +86,7 @@ time {
 
     time .month {
         border-radius: 2px 2px 0 0;
-        background-color: #752767;
+        background-color: #016ABF;
         color: #fff;
     }
 
