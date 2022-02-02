@@ -39,7 +39,11 @@ public partial class _Default : Page
     
             foreach(var item in feed.Items)
             {
+                //twitter handle
                 item.Authors.Add(new SyndicationPerson(key.Substring(5)));
+
+                //hack - also putting the authors Twitter handle in the copyright so that I can get to this field in a Logic App
+                item.Copyright = new TextSyndicationContent(key.Substring(5));
             }
             rss.Items = rss.Items.Union(feed.Items).GroupBy(i => i.Title.Text).Select(i => i.First()).OrderByDescending(i => i.PublishDate.Date);
         }
