@@ -6,7 +6,6 @@ master.xml
 
 # User-specific files
 *.suo
-.vs
 *.user
 *.sln.docstates
 
