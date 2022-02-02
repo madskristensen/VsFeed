@@ -49,12 +49,12 @@ public partial class _Default : Page
         }
 
         using (XmlWriter writer = XmlWriter.Create(_masterFile))
-            rss.SaveAsRss20(writer);
+            rss.SaveAsAtom10(writer);
 
         using (XmlWriter writer = XmlWriter.Create(_feedFile))
         {
             rss.Items = rss.Items.Take(10);
-            rss.SaveAsRss20(writer);
+            rss.SaveAsAtom10(writer);
         }
     }
 
