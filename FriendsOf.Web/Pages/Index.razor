@@ -1,0 +1,73 @@
+﻿@page "/"
+
+@using FriendsOf.Web.Services
+@using System.ServiceModel.Syndication;
+
+@inject RssService rssService
+@inject Microsoft.Extensions.Configuration.IConfiguration config
+@inject IJSRuntime JsRuntime
+
+<header role="banner">
+	<a href="/">
+		<h1 itemprop="name">@config["title"]</h1>
+	</a>
+</header>
+
+<div role="main">
+	@*<a href="/rss" title="Subscribe to the RSS feed" class="feed">Subscribe</a>*@
+
+	@if (feedItems is not null)
+	{
+		@foreach (var feedItem in feedItems)
+		{
+			<article itemscope itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+				<time itemprop="datePublished" datetime="@feedItem.PublishDate.ToString("yyyy-MM-dd HH:mm")">
+					<span class="month">@feedItem.PublishDate.ToString("MMM")</span>
+					<span class="day">@feedItem.PublishDate.Day</span>
+				</time>
+
+				<h2 itemprop="name"><a itemprop="url" href="@feedItem.Links[0].Uri">@feedItem.Title.Text</a></h2>
+				<p itemprop="articleBody">
+					@((MarkupString)feedItem.Summary.Text)
+				</p>
+				<a itemprop="url" href="@feedItem.Links[0].Uri" title="@feedItem.Title.Text">Read the article</a>
+			</article>
+		}
+	}
+	
+	<div id="paging">
+		<button @onclick="NextPage" rel="previous">&lt; Older</button>
+		@if (@pageNum > 1){
+			<button @onclick="PreviousPage" rel="previous">Newer &gt;</button>
+		}
+	</div>
+</div>
+
+<footer role="contentinfo">
+	<p>Powered by <a href="https://github.com/madskristensen/FeedCollector">Feed Collector</a></p>
+</footer>
+
+@code {
+	private int pageNum = 1;
+	private IEnumerable<SyndicationItem>? feedItems;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await rssService.DownloadFeeds();
+		feedItems = rssService.GetData(pageNum);
+	}
+
+	public void NextPage()
+	{
+		pageNum++;
+		feedItems = rssService.GetData(pageNum);
+		JsRuntime.InvokeVoidAsync("ScrollToTop");
+	}
+
+	public void PreviousPage()
+	{
+		pageNum--;
+		feedItems = rssService.GetData(pageNum);
+		JsRuntime.InvokeVoidAsync("ScrollToTop");
+	}
+}

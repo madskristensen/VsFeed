@@ -1,0 +1,14 @@
+﻿@page "/"
+@namespace FriendsOf.Web.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = "_Layout";
+}
+
+<component type="typeof(App)" render-mode="Server" />
+
+<script>
+    function ScrollToTop() {
+        document.documentElement.scrollTop = 0;
+    }
+</script>
