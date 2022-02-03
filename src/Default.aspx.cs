@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Policy;
 using System.ServiceModel.Syndication;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Hosting;
 using System.Web.UI;
 using System.Xml;
+
 using config = System.Configuration.ConfigurationManager;
 
 public partial class _Default : Page
@@ -46,7 +48,18 @@ public partial class _Default : Page
                                 i.Categories.Any(c => c.Name.Equals("visualstudio", StringComparison.OrdinalIgnoreCase))
                           select i;
 
-        rss.Items = rss.Items.Union(vsItems).GroupBy(i => i.Title.Text).Select(i => i.First()).OrderByDescending(i => i.PublishDate.Date);
+            rss.Items = rss.Items.Union(vsItems).GroupBy(i => i.Title.Text).Select(i => i.First()).OrderByDescending(i => i.PublishDate.Date);
+
+            foreach (var item in rss.Items)
+            {
+                var link = item.Links.FirstOrDefault();
+
+                if (link != null && !link.Uri.OriginalString.Contains('?'))
+                {
+                    var url = new Uri(link.Uri.OriginalString + "?utm_source=vsblogfeed&utm_medium=referral");
+                    item.Links[0] = new SyndicationLink(url);
+                }
+            }
         }
 
         using (XmlWriter writer = XmlWriter.Create(_masterFile))
