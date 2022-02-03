@@ -28,7 +28,7 @@ jobs:
 
       - name: Publish to folder
         run: |
-          msbuild.exe FriendsOf.sln /nologo /nr:false /p:DeployOnBuild=true /p:DeployDefaultTarget=WebPublish /p:WebPublishMethod=FileSystem /p:DeleteExistingFiles=True /p:platform="Any CPU" /p:configuration="Release" /p:PublishUrl="../_build"
+          msbuild.exe FriendsOf.sln /nologo /nr:false /p:DeployOnBuild=true /p:DeployDefaultTarget=WebPublish /p:WebPublishMethod=FileSystem /p:DeleteExistingFiles=True /p:platform="Any CPU" /p:configuration="Debug" /p:PublishUrl="../_build"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
