@@ -8,15 +8,21 @@
 @inject IJSRuntime _jsRuntime
 
 <header role="banner">
-	<a href="/">
-		<h1 itemprop="name">@_config["title"]</h1>
-	</a>
+    <div>
+        <div class="title">
+            <a href="/">
+                <h1 itemprop="name">@_config["title"]</h1>
+            </a>
+        </div>
+
+        <div class="rss">
+            <a href="/feed.xml"><img src="rss.png" alt="Subscribe to the RSS feed"/></a>
+        </div>
+    </div>
 </header>
 
 <div role="main">
-	@*<a href="/rss" title="Subscribe to the RSS feed" class="feed">Subscribe</a>*@
-
-	@if (_feedItems is not null)
+    @if (_feedItems is not null)
 	{
 		@foreach (var feedItem in _feedItems)
 		{
@@ -26,7 +32,8 @@
 					<span class="day">@feedItem.PublishDate.Day</span>
 				</time>
 
-				<h2 itemprop="name"><a itemprop="url" href="@feedItem.Links[0].Uri">@feedItem.Title.Text</a></h2>
+                <h2 itemprop="name"><a itemprop="url" href="@feedItem.Links[0].Uri">@feedItem.Title.Text</a></h2>
+                <h4>By: <a href="https://www.twitter.com/@feedItem.Authors[0].Email">@@@feedItem.Authors[0].Email</a></h4>
 				<p itemprop="articleBody">
 					@((MarkupString)feedItem.Summary.Text)
 				</p>
