@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<RssService>();
+builder.Services.AddHostedService<RssWorker>();
 
 var app = builder.Build();
 

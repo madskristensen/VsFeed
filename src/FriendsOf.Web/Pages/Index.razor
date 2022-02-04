@@ -51,9 +51,8 @@
 	private int _pageNum = 1;
 	private IEnumerable<SyndicationItem>? _feedItems;
 
-	protected override async Task OnInitializedAsync()
+	protected override void OnInitialized()
 	{
-		await _rssService.DownloadFeeds();
 		_feedItems = _rssService.GetData(_pageNum);
 	}
 
