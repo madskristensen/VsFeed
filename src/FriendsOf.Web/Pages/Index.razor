@@ -3,22 +3,22 @@
 @using FriendsOf.Web.Services
 @using System.ServiceModel.Syndication;
 
-@inject RssService rssService
-@inject Microsoft.Extensions.Configuration.IConfiguration config
-@inject IJSRuntime JsRuntime
+@inject RssService _rssService
+@inject IConfiguration _config
+@inject IJSRuntime _jsRuntime
 
 <header role="banner">
 	<a href="/">
-		<h1 itemprop="name">@config["title"]</h1>
+		<h1 itemprop="name">@_config["title"]</h1>
 	</a>
 </header>
 
 <div role="main">
 	@*<a href="/rss" title="Subscribe to the RSS feed" class="feed">Subscribe</a>*@
 
-	@if (feedItems is not null)
+	@if (_feedItems is not null)
 	{
-		@foreach (var feedItem in feedItems)
+		@foreach (var feedItem in _feedItems)
 		{
 			<article itemscope itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
 				<time itemprop="datePublished" datetime="@feedItem.PublishDate.ToString("yyyy-MM-dd HH:mm")">
@@ -37,7 +37,7 @@
 	
 	<div id="paging">
 		<button @onclick="NextPage" rel="previous">&lt; Older</button>
-		@if (@pageNum > 1){
+		@if (_pageNum > 1){
 			<button @onclick="PreviousPage" rel="previous">Newer &gt;</button>
 		}
 	</div>
@@ -48,26 +48,26 @@
 </footer>
 
 @code {
-	private int pageNum = 1;
-	private IEnumerable<SyndicationItem>? feedItems;
+	private int _pageNum = 1;
+	private IEnumerable<SyndicationItem>? _feedItems;
 
 	protected override async Task OnInitializedAsync()
 	{
-		await rssService.DownloadFeeds();
-		feedItems = rssService.GetData(pageNum);
+		await _rssService.DownloadFeeds();
+		_feedItems = _rssService.GetData(_pageNum);
 	}
 
 	public void NextPage()
 	{
-		pageNum++;
-		feedItems = rssService.GetData(pageNum);
-		JsRuntime.InvokeVoidAsync("ScrollToTop");
+		_pageNum++;
+		_feedItems = _rssService.GetData(_pageNum);
+		_jsRuntime.InvokeVoidAsync("ScrollToTop");
 	}
 
 	public void PreviousPage()
 	{
-		pageNum--;
-		feedItems = rssService.GetData(pageNum);
-		JsRuntime.InvokeVoidAsync("ScrollToTop");
+		_pageNum--;
+		_feedItems = _rssService.GetData(_pageNum);
+		_jsRuntime.InvokeVoidAsync("ScrollToTop");
 	}
 }

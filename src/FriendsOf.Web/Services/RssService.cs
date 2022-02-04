@@ -7,23 +7,23 @@ namespace FriendsOf.Web.Services
 {
     public class RssService
     {
-        private static readonly string _masterFile = "master.xml";
-        private static readonly string _feedFile = "feed.xml";
-        private readonly IConfiguration config;
+        private const string MasterFile = "./wwwroot/master.xml";
+        private const string FeedFile = "./wwwroot/feed.xml";
+        private readonly IConfiguration _config;
 
         public RssService(IConfiguration config)
         {
-            this.config = config;
+            this._config = config;
         }
 
         public async Task DownloadFeeds()
         {
-            var rss = new SyndicationFeed(config["title"], config["description"], null);
+            var rss = new SyndicationFeed(_config["title"], _config["description"], null);
 
             ServicePointManager.Expect100Continue = true;
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
-            var feedsConfig = config.GetSection("feeds").GetChildren();
+            var feedsConfig = _config.GetSection("feeds").GetChildren();
 
             foreach (var feedConfig in feedsConfig)
             {
@@ -40,10 +40,10 @@ namespace FriendsOf.Web.Services
                 rss.Items = rss.Items.Union(feed.Items).GroupBy(i => i.Title.Text).Select(i => i.First()).OrderByDescending(i => i.PublishDate.Date);
             }
 
-            using (XmlWriter writer = XmlWriter.Create(_masterFile))
+            await using (var writer = XmlWriter.Create(MasterFile))
                 rss.SaveAsAtom10(writer);
 
-            using (XmlWriter writer = XmlWriter.Create(_feedFile))
+            await using (var writer = XmlWriter.Create(FeedFile))
             {
                 rss.Items = rss.Items.Take(10);
                 rss.SaveAsAtom10(writer);
@@ -66,16 +66,16 @@ namespace FriendsOf.Web.Services
 
         public IEnumerable<SyndicationItem> GetData(int page)
         {
-            using XmlReader reader = XmlReader.Create(_masterFile);
+            using var reader = XmlReader.Create(MasterFile);
 
-            var count = int.Parse(config["postsPerPage"]);
+            var count = int.Parse(_config["postsPerPage"]);
             var items = SyndicationFeed.Load(reader).Items.Skip((page - 1) * count).Take(count);
             return items.Select(item => { CleanItem(item); return item; });
         }
 
         private static void CleanItem(SyndicationItem item)
         {
-            string summary = item.Summary != null ? item.Summary.Text : ((TextSyndicationContent)item.Content).Text;
+            var summary = item.Summary != null ? item.Summary.Text : ((TextSyndicationContent)item.Content).Text;
             summary = Regex.Replace(summary, "<[^>]*>", ""); // Strips out HTML
             item.Summary = new TextSyndicationContent(string.Join("", summary.Take(300)) + "...");
         }
