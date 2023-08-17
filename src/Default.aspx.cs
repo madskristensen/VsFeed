@@ -42,6 +42,7 @@ public partial class _Default : Page
 
             IEnumerable<SyndicationItem> vsItems = from i in feed.Items
                                                    where i.Title.Text.IndexOf("visual studio code", StringComparison.OrdinalIgnoreCase) == -1 &&
+                                                         i.Title.Text.IndexOf("vs code", StringComparison.OrdinalIgnoreCase) == -1 &&
                                                          (
                                                              i.Title.Text.IndexOf("visual studio", StringComparison.OrdinalIgnoreCase) > -1 ||
                                                              i.Summary.Text.IndexOf("visual studio", StringComparison.OrdinalIgnoreCase) > -1 ||
