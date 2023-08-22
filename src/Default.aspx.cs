@@ -59,7 +59,7 @@ public partial class _Default : Page
 
                 if (link != null && !link.Uri.OriginalString.Contains('?'))
                 {
-                    Uri url = new Uri(link.Uri.OriginalString + "?utm_source=vsblogfeed&utm_medium=referral");
+                    Uri url = new Uri(link.Uri.OriginalString + "?cid=vsblogfeed");
                     item.Links[0] = new SyndicationLink(url);
                 }
             }
